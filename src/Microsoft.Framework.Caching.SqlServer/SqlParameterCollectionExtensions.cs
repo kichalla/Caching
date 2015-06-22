@@ -85,6 +85,7 @@ namespace Microsoft.Framework.Caching.SqlServer
         {
             var parameter = new SqlParameter(parameterName, dbType);
             parameter.Value = value;
+            parameter.ResetSqlDbType();
             parameters.Add(parameter);
             return parameters;
         }
@@ -98,6 +99,7 @@ namespace Microsoft.Framework.Caching.SqlServer
         {
             var parameter = new SqlParameter(parameterName, dbType, size);
             parameter.Value = value;
+            parameter.ResetSqlDbType();
             parameters.Add(parameter);
             return parameters;
         }
