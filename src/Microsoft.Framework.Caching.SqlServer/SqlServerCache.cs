@@ -105,19 +105,47 @@ namespace Microsoft.Framework.Caching.SqlServer
                 DateTime? absoluteExpiration = null;
                 if (reader.Read())
                 {
-                    oldExpirationTime = reader.GetFieldValue<DateTime>(ExpiresAtTimeIndex);
-                    cacheItemvalue = reader.GetFieldValue<byte[]>(CacheItemValueIndex);
+                    oldExpirationTime = (DateTime)reader[ExpiresAtTimeIndex];
+                    cacheItemvalue = (byte[])reader[CacheItemValueIndex];
 
                     if (!reader.IsDBNull(SlidingExpirationInTicksIndex))
                     {
-                        slidingExpiration = TimeSpan.FromTicks(
-                            reader.GetFieldValue<long>(SlidingExpirationInTicksIndex));
+                        slidingExpiration = TimeSpan.FromTicks((long)reader[SlidingExpirationInTicksIndex]);
                     }
 
                     if (!reader.IsDBNull(AbsoluteExpirationIndex))
                     {
-                        absoluteExpiration = reader.GetFieldValue<DateTime>(AbsoluteExpirationIndex);
+                        absoluteExpiration = (DateTime)reader[AbsoluteExpirationIndex];
                     }
+
+                    //#if DNX451 || DNXCORE50
+                    //                    oldExpirationTime = reader.GetFieldValue<DateTime>(ExpiresAtTimeIndex);
+                    //                    cacheItemvalue = reader.GetFieldValue<byte[]>(CacheItemValueIndex);
+
+                    //                    if (!reader.IsDBNull(SlidingExpirationInTicksIndex))
+                    //                    {
+                    //                        slidingExpiration = TimeSpan.FromTicks(
+                    //                            reader.GetFieldValue<long>(SlidingExpirationInTicksIndex));
+                    //                    }
+
+                    //                    if (!reader.IsDBNull(AbsoluteExpirationIndex))
+                    //                    {
+                    //                        absoluteExpiration = reader.GetFieldValue<DateTime>(AbsoluteExpirationIndex);
+                    //                    }
+                    //#else
+                    //                    oldExpirationTime = (DateTime)reader[ExpiresAtTimeIndex];
+                    //                    cacheItemvalue = (byte[])reader[CacheItemValueIndex];
+
+                    //                    if (!reader.IsDBNull(SlidingExpirationInTicksIndex))
+                    //                    {
+                    //                        slidingExpiration = TimeSpan.FromTicks((long)reader[SlidingExpirationInTicksIndex]);
+                    //                    }
+
+                    //                    if (!reader.IsDBNull(AbsoluteExpirationIndex))
+                    //                    {
+                    //                        absoluteExpiration = (DateTime)reader[AbsoluteExpirationIndex];
+                    //                    }
+                    //#endif
                 }
                 else
                 {

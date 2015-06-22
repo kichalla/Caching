@@ -85,7 +85,7 @@ namespace Microsoft.Framework.Caching.SqlServer
         {
             var parameter = new SqlParameter(parameterName, dbType);
             parameter.Value = value;
-            parameter.ResetSqlDbType();
+            parameter.ResetSqlDbType(); // todo: required to make it work on Mono
             parameters.Add(parameter);
             return parameters;
         }
@@ -99,7 +99,7 @@ namespace Microsoft.Framework.Caching.SqlServer
         {
             var parameter = new SqlParameter(parameterName, dbType, size);
             parameter.Value = value;
-            parameter.ResetSqlDbType();
+            parameter.ResetSqlDbType(); // todo: required to make it work on Mono
             parameters.Add(parameter);
             return parameters;
         }
