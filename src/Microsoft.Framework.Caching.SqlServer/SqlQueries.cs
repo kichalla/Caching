@@ -8,9 +8,9 @@ namespace Microsoft.Framework.Caching.SqlServer
         private const string CreateTableFormat = "CREATE TABLE {0}(" +
             "Id nvarchar(100)  NOT NULL PRIMARY KEY, " +
             "Value varbinary(MAX) NOT NULL, " +
-            "ExpiresAtTime datetimeoffset NOT NULL, " +
+            "ExpiresAtTime datetime2 NOT NULL, " +
             "SlidingExpirationInTicks bigint NULL," +
-            "AbsoluteExpiration datetimeoffset NULL)";
+            "AbsoluteExpiration datetime2 NULL)";
 
         private const string CreateNonClusteredIndexOnExpirationTimeFormat
             = "CREATE NONCLUSTERED INDEX Index_ExpiresAtTime ON {0}(ExpiresAtTime)";

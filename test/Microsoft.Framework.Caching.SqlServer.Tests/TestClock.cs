@@ -25,5 +25,13 @@ namespace Microsoft.Framework.Internal
 
             return this;
         }
+
+        public DateTime DateTimeInUTC
+        {
+            get
+            {
+                return UtcNow.UtcDateTime;
+            }
+        }
     }
 }

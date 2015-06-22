@@ -3,7 +3,6 @@
 
 using System;
 using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Framework.Caching.Distributed;
 using Microsoft.Framework.Caching.SqlServer;
 using Microsoft.Framework.Configuration;

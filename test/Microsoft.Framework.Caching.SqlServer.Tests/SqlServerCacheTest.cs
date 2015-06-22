@@ -17,10 +17,12 @@ namespace Microsoft.Framework.Caching.SqlServer
     // public
     public class SqlServerCacheTest
     {
-        private const string TableName = "CacheTest";
-
         private readonly string ConnectionString
             = "Server=.;Database=CacheTestDb;Trusted_Connection=True;";
+
+        private const string SchemaName = "dbo";
+
+        private const string TableName = "CacheTest";
 
         [Fact]
         public async Task ReturnsNullValue_ForNonExistingCacheItem()
@@ -29,6 +31,7 @@ namespace Microsoft.Framework.Caching.SqlServer
             var options = new SqlServerCacheOptions()
             {
                 ConnectionString = ConnectionString,
+                SchemaName = SchemaName,
                 TableName = TableName,
                 ExpiredItemsDeletionInterval = TimeSpan.FromHours(2)
             };
@@ -53,6 +56,7 @@ namespace Microsoft.Framework.Caching.SqlServer
             var options = new SqlServerCacheOptions()
             {
                 ConnectionString = ConnectionString,
+                SchemaName = SchemaName,
                 TableName = TableName,
                 SystemClock = testClock,
                 ExpiredItemsDeletionInterval = TimeSpan.FromHours(2)
@@ -83,8 +87,9 @@ namespace Microsoft.Framework.Caching.SqlServer
             var testClock = new TestClock();
             var options = new SqlServerCacheOptions()
             {
-                TableName = ConnectionString,
-                ConnectionString = TableName,
+                SchemaName = SchemaName,
+                TableName = TableName,
+                ConnectionString = ConnectionString,
                 SystemClock = testClock,
                 ExpiredItemsDeletionInterval = TimeSpan.FromHours(2)
             };
@@ -115,8 +120,9 @@ namespace Microsoft.Framework.Caching.SqlServer
             var testClock = new TestClock();
             var options = new SqlServerCacheOptions()
             {
-                TableName = ConnectionString,
-                ConnectionString = TableName,
+                TableName = TableName,
+                ConnectionString = ConnectionString,
+                SchemaName = SchemaName,
                 SystemClock = testClock,
                 ExpiredItemsDeletionInterval = TimeSpan.FromHours(2)
             };
@@ -148,6 +154,7 @@ namespace Microsoft.Framework.Caching.SqlServer
             var options = new SqlServerCacheOptions()
             {
                 ConnectionString = ConnectionString,
+                SchemaName = SchemaName,
                 TableName = TableName,
                 SystemClock = testClock,
                 ExpiredItemsDeletionInterval = TimeSpan.FromHours(2)
@@ -182,6 +189,7 @@ namespace Microsoft.Framework.Caching.SqlServer
             var options = new SqlServerCacheOptions()
             {
                 ConnectionString = ConnectionString,
+                SchemaName = SchemaName,
                 TableName = TableName,
                 SystemClock = testClock,
                 ExpiredItemsDeletionInterval = TimeSpan.FromHours(2)
@@ -213,6 +221,7 @@ namespace Microsoft.Framework.Caching.SqlServer
             var options = new SqlServerCacheOptions()
             {
                 ConnectionString = ConnectionString,
+                SchemaName = SchemaName,
                 TableName = TableName,
                 SystemClock = testClock,
                 ExpiredItemsDeletionInterval = TimeSpan.FromHours(2)
@@ -248,6 +257,7 @@ namespace Microsoft.Framework.Caching.SqlServer
             var options = new SqlServerCacheOptions()
             {
                 ConnectionString = ConnectionString,
+                SchemaName = SchemaName,
                 TableName = TableName,
                 SystemClock = testClock,
                 ExpiredItemsDeletionInterval = TimeSpan.FromHours(2)
@@ -267,7 +277,11 @@ namespace Microsoft.Framework.Caching.SqlServer
                 .SetAbsoluteExpiration(absolute: absoluteExpiration));
 
             // Assert
-            await AssertGetCacheItemFromDatabaseAsync(sqlServerCache, key, expectedValue, absoluteExpiration);
+            await AssertGetCacheItemFromDatabaseAsync(
+                sqlServerCache,
+                key,
+                expectedValue,
+                absoluteExpiration);
         }
 
         [Fact]
@@ -278,6 +292,7 @@ namespace Microsoft.Framework.Caching.SqlServer
             var options = new SqlServerCacheOptions()
             {
                 ConnectionString = ConnectionString,
+                SchemaName = SchemaName,
                 TableName = TableName,
                 SystemClock = testClock,
                 ExpiredItemsDeletionInterval = TimeSpan.FromHours(2)
@@ -296,7 +311,11 @@ namespace Microsoft.Framework.Caching.SqlServer
                 key,
                 expectedValue,
                 new DistributedCacheEntryOptions().SetAbsoluteExpiration(absoluteExpiration));
-            await AssertGetCacheItemFromDatabaseAsync(sqlServerCache, key, expectedValue, absoluteExpiration);
+            await AssertGetCacheItemFromDatabaseAsync(
+                sqlServerCache,
+                key,
+                expectedValue,
+                absoluteExpiration);
 
             // Updates an existing item with new absolute expiration time
             absoluteExpiration = testClock.UtcNow.Add(TimeSpan.FromMinutes(30));
@@ -316,6 +335,7 @@ namespace Microsoft.Framework.Caching.SqlServer
             var options = new SqlServerCacheOptions()
             {
                 ConnectionString = ConnectionString,
+                SchemaName = SchemaName,
                 TableName = TableName,
                 SystemClock = testClock,
                 ExpiredItemsDeletionInterval = TimeSpan.FromHours(2)
@@ -359,6 +379,7 @@ namespace Microsoft.Framework.Caching.SqlServer
             var options = new SqlServerCacheOptions()
             {
                 ConnectionString = ConnectionString,
+                SchemaName = SchemaName,
                 TableName = TableName,
                 SystemClock = testClock,
                 ExpiredItemsDeletionInterval = TimeSpan.FromHours(2)
@@ -381,7 +402,7 @@ namespace Microsoft.Framework.Caching.SqlServer
             var utcNow = testClock.UtcNow;
             var cacheItemInfo = await GetCacheItemFromDatabaseAsync(key);
             Assert.NotNull(cacheItemInfo);
-            Assert.Equal(utcNow.AddMinutes(10), cacheItemInfo.ExpiresAtTime);
+            Assert.Equal(utcNow.AddMinutes(10).UtcDateTime, cacheItemInfo.ExpiresAtTime);
 
             // trigger extension of expiration - succeeds
             utcNow = testClock.Add(TimeSpan.FromMinutes(8)).UtcNow;
@@ -398,15 +419,16 @@ namespace Microsoft.Framework.Caching.SqlServer
         }
 
         [Fact]
-        public async Task DoestNotExtendsExpirationTime_ForAbsoluteExpiration()
+        public async Task DoestNotExtendExpirationTime_ForAbsoluteExpiration()
         {
             // Arrange
             var testClock = new TestClock();
             var absoluteExpirationRelativeToNow = TimeSpan.FromSeconds(30);
-            var expectedExpiresAtTime = testClock.UtcNow.Add(absoluteExpirationRelativeToNow);
+            var expectedExpiresAtTimeDateTimeOffset = testClock.UtcNow.Add(absoluteExpirationRelativeToNow);
             var options = new SqlServerCacheOptions()
             {
                 ConnectionString = ConnectionString,
+                SchemaName = SchemaName,
                 TableName = TableName,
                 SystemClock = testClock,
                 ExpiredItemsDeletionInterval = TimeSpan.FromHours(2)
@@ -433,7 +455,7 @@ namespace Microsoft.Framework.Caching.SqlServer
             // verify if the expiration time in database is set as expected
             var cacheItemInfo = await GetCacheItemFromDatabaseAsync(key);
             Assert.NotNull(cacheItemInfo);
-            Assert.Equal(expectedExpiresAtTime, cacheItemInfo.ExpiresAtTime);
+            Assert.Equal(expectedExpiresAtTimeDateTimeOffset.UtcDateTime, cacheItemInfo.ExpiresAtTime);
         }
 
         [Fact]
@@ -444,6 +466,7 @@ namespace Microsoft.Framework.Caching.SqlServer
             var options = new SqlServerCacheOptions()
             {
                 ConnectionString = ConnectionString,
+                SchemaName = SchemaName,
                 TableName = TableName,
                 SystemClock = testClock,
                 ExpiredItemsDeletionInterval = TimeSpan.FromHours(2)
@@ -477,7 +500,7 @@ namespace Microsoft.Framework.Caching.SqlServer
             Assert.Equal(expectedValue, value);
             var cacheItemInfo = await GetCacheItemFromDatabaseAsync(key);
             Assert.NotNull(cacheItemInfo);
-            Assert.Equal(expectedExpirationTime, cacheItemInfo.ExpiresAtTime);
+            Assert.Equal(expectedExpirationTime.UtcDateTime, cacheItemInfo.ExpiresAtTime);
         }
 
         private async Task<CacheItemInfo> GetCacheItemFromDatabaseAsync(string key)
@@ -499,7 +522,7 @@ namespace Microsoft.Framework.Caching.SqlServer
                     var cacheItemInfo = new CacheItemInfo();
                     cacheItemInfo.Id = key;
                     cacheItemInfo.Value = await reader.GetFieldValueAsync<byte[]>(1);
-                    cacheItemInfo.ExpiresAtTime = await reader.GetFieldValueAsync<DateTimeOffset>(2);
+                    cacheItemInfo.ExpiresAtTime = await reader.GetFieldValueAsync<DateTime>(2);
 
                     if (!await reader.IsDBNullAsync(3))
                     {
@@ -508,7 +531,7 @@ namespace Microsoft.Framework.Caching.SqlServer
 
                     if (!await reader.IsDBNullAsync(4))
                     {
-                        cacheItemInfo.AbsoluteExpiration = await reader.GetFieldValueAsync<DateTimeOffset>(4);
+                        cacheItemInfo.AbsoluteExpiration = await reader.GetFieldValueAsync<DateTime>(4);
                     }
 
                     return cacheItemInfo;
