@@ -31,7 +31,12 @@ namespace SqlServerCacheSample
 
         public IConfiguration Configuration { get; }
 
-        public async Task Main()
+        public void Main()
+        {
+            RunSampleAsync().GetAwaiter().GetResult();
+        }
+
+        public async Task RunSampleAsync()
         {
             var key = Guid.NewGuid().ToString();
             var message = "Hello, World!";
