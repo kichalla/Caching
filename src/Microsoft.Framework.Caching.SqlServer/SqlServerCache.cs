@@ -94,7 +94,7 @@ namespace Microsoft.Framework.Caching.SqlServer
                 var command = new SqlCommand(_sqlQueries.GetCacheItem, connection);
                 command.Parameters
                     .AddCacheItemId(key)
-                    .AddWithValue("UtcNow", SqlDbType.DateTime2, utcNow);
+                    .AddWithValue("UtcNow", SqlDbType.DateTime, utcNow);
 
                 connection.Open();
 
@@ -160,7 +160,7 @@ namespace Microsoft.Framework.Caching.SqlServer
                 var command = new SqlCommand(_sqlQueries.GetCacheItem, connection);
                 command.Parameters
                     .AddCacheItemId(key)
-                    .AddWithValue("UtcNow", SqlDbType.DateTime2, utcNow);
+                    .AddWithValue("UtcNow", SqlDbType.DateTime, utcNow);
 
                 await connection.OpenAsync();
 
@@ -349,7 +349,7 @@ namespace Microsoft.Framework.Caching.SqlServer
             var utcNow = (DateTime)state;
             var connection = new SqlConnection(_options.ConnectionString);
             var command = new SqlCommand(_sqlQueries.DeleteExpiredCacheItems, connection);
-            command.Parameters.AddWithValue("UtcNow", SqlDbType.DateTime2, utcNow);
+            command.Parameters.AddWithValue("UtcNow", SqlDbType.DateTime, utcNow);
 
             try
             {
