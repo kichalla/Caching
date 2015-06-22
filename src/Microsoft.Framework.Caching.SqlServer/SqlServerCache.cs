@@ -105,17 +105,17 @@ namespace Microsoft.Framework.Caching.SqlServer
                 DateTime? absoluteExpiration = null;
                 if (reader.Read())
                 {
-                    oldExpirationTime = (DateTime)reader[ExpiresAtTimeIndex];
+                    oldExpirationTime = DateTime.Parse(reader[ExpiresAtTimeIndex].ToString());
                     cacheItemvalue = (byte[])reader[CacheItemValueIndex];
 
                     if (!reader.IsDBNull(SlidingExpirationInTicksIndex))
                     {
-                        slidingExpiration = TimeSpan.FromTicks((long)reader[SlidingExpirationInTicksIndex]);
+                        slidingExpiration = TimeSpan.FromTicks(reader.GetInt64(SlidingExpirationInTicksIndex));
                     }
 
                     if (!reader.IsDBNull(AbsoluteExpirationIndex))
                     {
-                        absoluteExpiration = (DateTime)reader[AbsoluteExpirationIndex];
+                        absoluteExpiration = DateTime.Parse(reader[AbsoluteExpirationIndex].ToString());
                     }
 
                     //#if DNX451 || DNXCORE50
